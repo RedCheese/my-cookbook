@@ -1,3 +1,5 @@
+from pdf_generator import PDFGenerator
+
 from PyQt5.QtWidgets import (QWidget, QLabel, QVBoxLayout, QHBoxLayout, 
                              QPlainTextEdit, QListWidget, QPushButton, QLineEdit, QMessageBox)
 from PyQt5.QtGui import QPixmap
@@ -13,6 +15,8 @@ class RecipeWindow(QWidget):
         self.setWindowTitle("Recipe Window")
         
         self.resize(1600, 900)
+
+        self.current_recipe = {}
         
         ###------- Objects --------###
         
@@ -68,8 +72,8 @@ class RecipeWindow(QWidget):
         self.rec_close_btn = QPushButton("Close")
         self.rec_close_btn.clicked.connect(self.close_window)
         
-        #self.rec_edit_btn = QPushButton("Edit")
-        #self.rec_edit_btn.clicked.connect(self.edit_recipe)
+        self.rec_download_btn = QPushButton("Download")
+        self.rec_download_btn.clicked.connect(self.download_recipe)
         
         ###------- Layout --------###
         self.master_layout = QHBoxLayout()
@@ -113,7 +117,7 @@ class RecipeWindow(QWidget):
         # Buttons Group
         self.col1_btn_group = QHBoxLayout()
         self.col1_btn_group.addWidget(self.rec_close_btn)
-        #self.col1_btn_group.addWidget(self.rec_edit_btn)
+        self.col1_btn_group.addWidget(self.rec_download_btn)
         
         self.col1_group1.addLayout(self.col1_prep_group)
         self.col1_group1.addLayout(self.col1_cook_group)
@@ -142,8 +146,12 @@ class RecipeWindow(QWidget):
         self.setLayout(self.master_layout)
         
     def load_data(self, recipe):
+        """ This function loads the data from the selected recipe in the main window
+            and displays it in the appropriate fields in this window."""
         self.rec_ingredients_list.clear()
         self.rec_category_list.clear()
+
+        self.current_recipe = recipe # Store the current recipe for PDF generation
         
         self.setWindowTitle(recipe["title"])
         
@@ -187,3 +195,17 @@ class RecipeWindow(QWidget):
         self.rec_image.setPixmap(image) # Place the image inside the container
         self.rec_image.show() # Show the image
         
+    def download_recipe(self):
+        """
+        This calls the class to generate the PDF file fo the recipe
+        Theres the options for opening the file:
+        
+        pdf_generator.generate_recipe_pdf(self.current_recipe, open_mode="folder")
+        pdf_generator.generate_recipe_pdf(self.current_recipe, open_mode="file")
+        pdf_generator.generate_recipe_pdf(self.current_recipe, open_mode=None)
+        """
+        pdf_generator = PDFGenerator()
+        pdf_generator.generate_recipe_pdf(self.current_recipe, open_mode="file")
+
+    def clear_recipe_fields(self):
+        print("clear")
